@@ -312,6 +312,7 @@
     m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
     })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
     ga('create', 'UA-45797376-1', 'validatejs.org');
+    ga('set', 'anonymizeIp', true);
     ga('require', 'displayfeatures');
     ga('send', 'pageview');
   </script>
@@ -405,6 +406,7 @@
       <li>
         <a href="#changelog">Changelog</a>
         <ul>
+		  <li><a href="https://github.com/ansman/validate.js/releases/tag/0.13.1">0.13.1</a></li>
           <li><a href="#changelog-0-12-0">0.12.0</a></li>
           <li><a href="#changelog-0-11-1">0.11.1</a></li>
           <li><a href="#changelog-0-11-0">0.11.0</a></li>
@@ -465,15 +467,15 @@
           </p>
           <h2 id="downloads">Downloads</h2>
           <div class="download">
-            <a class="btn btn-default" download href="validate.js">Development version (0.12.0)</a>
+            <a class="btn btn-default" download href="validate.js">Development version (0.13.1)</a>
             <div class="info">
-              <span class="details">36KB, uncompressed and plenty of comments</span>
+              <span class="details">38KB, uncompressed and plenty of comments</span>
             </div>
           </div>
           <div class="download">
-            <a class="btn btn-primary" download href="validate.min.js">Production version (0.12.0)</a>
+            <a class="btn btn-primary" download href="validate.min.js">Production version (0.13.1)</a>
             <div class="info">
-              <span class="details">4.66KB, minified and gzipped</span><br>
+              <span class="details">5.05KB, minified and gzipped</span><br>
               <a download href="validate.min.map">(Source map)</a>
             </div>
           </div>
@@ -492,7 +494,7 @@
           <div id="installing">
             <h2>Installing</h2>
             <b>Browser/CDN</b>
-            <pre><code class="html">&lt;script src="//cdnjs.cloudflare.com/ajax/libs/validate.js/0.12.0/validate.min.js"&gt;&lt;/script&gt;</code></pre>
+            <pre><code class="html">&lt;script src="//cdnjs.cloudflare.com/ajax/libs/validate.js/0.13.1/validate.min.js"&gt;&lt;/script&gt;</code></pre>
             <b>Require.js/AMD</b>
             <pre><code class="javascript">require(["validate.js"], function(validate) {
   // ...
@@ -919,7 +921,7 @@ validate.Promise = RSVP.Promise;</code></pre>
               verbose so there is a shorthand for this.
             </p>
             <p class="description">
-              It does little more than proxying the call do the main validation
+              It does little more than proxying the call to the main validation
               function but with the value wrapped in an object and the options
               <b>fullMessages</b> and <b>format</b> set to <code>"flat"</code>.
               This is because there is no name which means it can't produce
@@ -1276,13 +1278,13 @@ var constraints = {
     datetime: {
       dateOnly: true,
       latest: moment.utc().subtract(18, 'years'),
-      message: "^You need to be atleast 18 years old"
+      message: "^You need to be at least 18 years old"
     }
   }
 };
 
 validate({birthday: "3013-11-14"}, constraints);
-// =&gt; {"birthday": ["You need to be atleast 18 years old"]}</code></pre>
+// =&gt; {"birthday": ["You need to be at least 18 years old"]}</code></pre>
           </div>
           <div id="validators-email">
             <div class="signature"><b>email</b></div>
@@ -1852,6 +1854,11 @@ validate({myAttribute: true}, {myAttribute: {type: "customType"}});
                 local hostnames such as <code>10.0.1.1</code> or
                 <code>localhost</code>. The default is <code>false</code>.
               </li>
+              <li>
+                <b>allowDataUrl</b> - A boolean that if <code>true</code> allows
+                data URLs as defined in <a href="https://tools.ietf.org/html/rfc2397">RFC 2397</a>.
+                The default is <code>false</code>
+              </li>
             </ul>
             <pre><code class="javascript">validate({website: "http://google.com"}, {website: {url: true}});
 // =&gt; undefined
@@ -1881,6 +1888,19 @@ validate({website: "http://localhost"}, {
     }
   }
 });
+// =&gt; undefined
+
+validate({website: "data:,Hello%2C%20World!"}, {website: {url: true}});
+// =&gt; {"website": ["Website is not a valid url"]}
+
+validate({website: "data:,Hello%2C%20World!"}, {
+    website: {
+        url: {
+            allowDataUrl: true
+        }
+      }
+    }
+);
 // =&gt; undefined</code></pre>
           </div>
         </div>
@@ -2405,29 +2425,17 @@ validate.result("foo".toUpperCase);
         </div>
         <div id="changelog">
           <h2>Changelog</h2>
-          <div id="changelog-wip">
+          <div id="changelog-0-13-0">
             <h3>
-              <b class="version">WIP</b>
+              <b class="version">0.13.1</b>
+              -
+              <span class="date">Jun 15, 2018</span>
+              -
+              <a href="http://htmlpreview.github.com/?https://raw.github.com/ansman/validate.js/0.13.1/index.html">Docs</a>
+              -
+              <a href="https://github.com/ansman/validate.js/compare/0.12.0...0.13.1">Diff</a>
             </h3>
-            <ul>
-              <li>
-                Fix some issues with the email validation. Thanks
-                <a href="https://github.com/ansman/validate.js/issues/240" target="_blank">Yusuf Aji Wibowo</a>
-                for reporting it.
-              </li>
-              <li>
-                If <code>within</code> in the exclusion validator is an object
-                the values are now used when formatting <code>${value}</code>
-                in the message. Thanks
-                <a href="https://github.com/ansman/validate.js/issues/215" target="_blank">Rhys Lloyd</a>
-                for reporting it.
-              </li>
-              <li>
-                There is now a type validator that will check the value's type. Thanks
-                <a href="https://github.com/ansman/validate.js/issues/80" target="_blank">Dmitry Kirilyuk</a>
-                for suggesting this.
-              </li>
-            </ul>
+            See https://github.com/ansman/validate.js/releases/tag/0.13.1 for the changelog.
           </div>
           <div id="changelog-0-12-0">
             <h3>
@@ -2450,7 +2458,7 @@ validate.result("foo".toUpperCase);
                 <b>Breaking!</b> The presence validator no longer rejects empty
                 values (empty strings, arrays, objects etc) per default.
                 The option <code>allowEmpty</code> can be set to false to
-                start passing them through.
+                prevent passing them through.
               </li>
               <li>
                 The numericality validator now allows negative numbers in strict

@@ -1,7 +1,7 @@
 /*!
- * validate.js 0.12.0
+ * validate.js 0.13.1
  *
- * (c) 2013-2017 Nicklas Ansman, 2013 Wrapp
+ * (c) 2013-2019 Nicklas Ansman, 2013 Wrapp
  * Validate.js may be freely distributed under the MIT license.
  * For all details and documentation:
  * http://validatejs.org/
@@ -52,8 +52,8 @@
     // The toString function will allow it to be coerced into a string
     version: {
       major: 0,
-      minor: 12,
-      patch: 0,
+      minor: 13,
+      patch: 1,
       metadata: "development",
       toString: function() {
         var version = v.format("%{major}.%{minor}.%{patch}", v.version);
@@ -387,6 +387,10 @@
       }
 
       if (v.isObject(str)) {
+        if (!v.isDefined(str.toString)) {
+          return JSON.stringify(str);
+        }
+
         return str.toString();
       }
 
@@ -1099,8 +1103,8 @@
 
       var message = options.message || this.message || "is not a valid url"
         , schemes = options.schemes || this.schemes || ['http', 'https']
-        , allowLocal = options.allowLocal || this.allowLocal || false;
-
+        , allowLocal = options.allowLocal || this.allowLocal || false
+        , allowDataUrl = options.allowDataUrl || this.allowDataUrl || false;
       if (!v.isString(value)) {
         return message;
       }
@@ -1148,6 +1152,14 @@
         // resource path
         "(?:[/?#]\\S*)?" +
       "$";
+
+      if (allowDataUrl) {
+        // RFC 2397
+        var mediaType = "\\w+\\/[-+.\\w]+(?:;[\\w=]+)*";
+        var urlchar = "[A-Za-z0-9-_.!~\\*'();\\/?:@&=+$,%]*";
+        var dataurl = "data:(?:"+mediaType+")?(?:;base64)?,"+urlchar;
+        regex = "(?:"+regex+")|(?:^"+dataurl+"$)";
+      }
 
       var PATTERN = new RegExp(regex, 'i');
       if (!PATTERN.exec(value)) {
